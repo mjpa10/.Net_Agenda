@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models;
+﻿using API_Agenda.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace APIAgenda.Context;
 
