@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API_Agenda.Models;
 
@@ -13,12 +14,14 @@ public class Contato {
     public string? Nome { get; set; }
 
     [Required(ErrorMessage = "O e-mail é obrigatório.")]
-    //[EmailAddress(ErrorMessage = "O e-mail informado não é válido.")]
+    [EmailAddress(ErrorMessage = "O e-mail informado não é válido.")]
     public string? Email { get; set; }
 
     [Required(ErrorMessage = "O telefone é obrigatório.")]
-    //[Phone(ErrorMessage = "O número de telefone informado não é válido.")]
+    [Phone(ErrorMessage = "O número de telefone informado não é válido.")]
     [StringLength(15, ErrorMessage = "O telefone deve ter no máximo 15 caracteres.")]
     public string? Telefone { get; set; }
 
+    [DataType(DataType.Date, ErrorMessage = "Data de nascimento inválida.")]
+    public DateOnly? Aniversario { get; set; } = null;
 }

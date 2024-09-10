@@ -1,4 +1,5 @@
 ﻿using API_Agenda.Models;
+using API_Agenda.Services;
 using APIAgenda.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,16 @@ namespace API_Agenda.Controllers;
 public class ContatosController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IValidaEmail _validaEmail;
+    private readonly IValidaAniversario _validaAniversario;
+    private readonly IValidaTelefone _validaTelefone;
 
-    public ContatosController(AppDbContext context)
+    public ContatosController(AppDbContext context, IValidaEmail validaEmail, IValidaAniversario validaAniversario, IValidaTelefone validaTelefone )
     { 
-        _context = context; 
+        _context = context;
+        _validaEmail = validaEmail;
+        _validaAniversario = validaAniversario;
+        _validaTelefone = validaTelefone;
     }
 
     [HttpGet]
@@ -41,10 +48,19 @@ public class ContatosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Contato>> PostAsync(Contato contato)
+    public async Task<ActionResult<Contato>> PostAsync([FromBody]Contato contato)
     {
         if (contato == null)
             return BadRequest("Contato Inválido");
+
+        if (await _validaEmail.EmailJaExisteAsync(contato.Email))
+            return Conflict("E-mail já cadastrado.");
+
+        if (await _validaTelefone.ValidaTelefoneAsync(contato.Telefone))
+            return Conflict("Telefone já cadastrado.");
+
+        if (!await _validaAniversario.AniversarioValidoAsync(contato.Aniversario))
+            return Conflict("Data de aniversário está fora do intervalo permitido, no futuro.");
 
         _context.Contatos.Add(contato);
 
@@ -55,7 +71,7 @@ public class ContatosController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<Contato>> PutAsync(int id, Contato contato)
+    public async Task<ActionResult<Contato>> PutAsync(int id,[FromBody] Contato contato)
     {
         if (id != contato.Id)
             return BadRequest();
