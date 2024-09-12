@@ -1,3 +1,4 @@
+using API_Agenda.DTOs.Mappings;
 using API_Agenda.Logging;
 using API_Agenda.Repository;
 using API_Agenda.Services;
@@ -17,7 +18,7 @@ builder.Services.AddScoped<IValidaTelefone, ValidaTelefone>();
 builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 builder.Services.AddScoped<IValidadorContato, ValidadorContato>();
 builder.Services.AddScoped<IUnitOfwork, UnitOfWork>();
-builder.Services.AddAutoMapper(typeof(UnitOfWork)); 
+builder.Services.AddAutoMapper(typeof(ContatoDTOMappingProfile)); 
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 { LogLevel = LogLevel.Information }));

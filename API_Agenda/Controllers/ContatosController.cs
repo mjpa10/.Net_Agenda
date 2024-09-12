@@ -1,9 +1,10 @@
-﻿using API_Agenda.Models;
+﻿using API_Agenda.DTOs;
+using API_Agenda.Models;
 using API_Agenda.Repository;
 using API_Agenda.Services;
 using APIAgenda.Context;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API_Agenda.Controllers;
 
@@ -13,45 +14,47 @@ public class ContatosController : ControllerBase
 {
     private readonly IValidadorContato _validadorContato;
     private readonly IUnitOfwork _uof;
-    private readonly ILogger _logger;
+    private readonly IMapper _mapper;
 
     public ContatosController(IUnitOfwork uof,
                                IValidadorContato validadorContato,
-                               ILogger<ContatosController> logger)
+                               IMapper mapper)
     {
         _validadorContato = validadorContato;
-        _logger = logger;
+        _mapper = mapper;
         _uof = uof;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Contato>>> Get()
-    {
-        _logger.LogInformation("=====Get api/Contatos ========");
-
+    public async Task<ActionResult<IEnumerable<ContatoDTO>>> Get()
+    {        
        var contatos = await _uof.ContatoRepository.GetAllAsync();
 
-       return Ok(contatos);
+       var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+
+       return Ok(contatosDto);
     }
 
-    [HttpGet("{id:int}", Name="ObterContato")]
-    public async Task<ActionResult<Contato>> GetByIdAsync(int id)
-    {
-        _logger.LogInformation($"=====Get api/Contatos/id = {id} ========");
 
-        var contato = await _uof.ContatoRepository.GetContatoAsync(id);
-        
+    [HttpGet("{id:int}", Name="ObterContato")]
+    public async Task<ActionResult<ContatoDTO>> GetByIdAsync(int id)
+    {        
+        var contato = await _uof.ContatoRepository.GetContatoAsync(id);        
         if (contato == null)
             return NotFound($"contato com id={id} não encontrado...");
 
-        return Ok(contato);
+        var contatoDto = _mapper.Map<ContatoDTO>(contato); 
+
+        return Ok(contatoDto);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Contato>> PostAsync([FromBody]Contato contato)
+    public async Task<ActionResult<ContatoDTO>> PostAsync([FromBody] ContatoDTO contatoDTO)
     {
-        if (contato == null)
+        if (contatoDTO == null)
             return BadRequest("Dados Inválidos");
+
+        var contato = _mapper.Map<Contato>(contatoDTO);
 
         var erros = await _validadorContato.ValidarContatoAsync(contato); //um contador de erros para que todos sejam exibidos
 
@@ -61,25 +64,30 @@ public class ContatosController : ControllerBase
         var contatoCriado = _uof.ContatoRepository.Create(contato);
         _uof.Commit();
 
+        var contatoCriadoDto = _mapper.Map<ContatoDTO>(contatoCriado);
+
         return new CreatedAtRouteResult("ObterContato",
-            new { id = contatoCriado.Id }, contatoCriado);
+            new { id = contatoCriadoDto.Id }, contatoCriadoDto);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<Contato>> PutAsync(int id,Contato contato)
+    public async Task<ActionResult<ContatoDTO>> PutAsync(int id, ContatoDTO contatoDTO)
     {
-
-        if (id != contato.Id)
+        if (id != contatoDTO.Id)
             return BadRequest("Dados invalidos");
+
+        var contato = _mapper.Map<Contato>(contatoDTO);
 
         _uof.ContatoRepository.Update(contato);
          _uof.Commit();
 
-        return Ok(contato);
+        var produtoAtualizadoDto = _mapper.Map<ContatoDTO>(contato);
+
+        return Ok(produtoAtualizadoDto);
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<ActionResult<Contato>> Delete(int id)
+    public async Task<ActionResult<ContatoDTO>> Delete(int id)
     {
         var contato = await _uof.ContatoRepository.GetContatoAsync(id);
 
@@ -89,6 +97,8 @@ public class ContatosController : ControllerBase
         var contatoExcluido = _uof.ContatoRepository.Delete(id);
         _uof.Commit();
 
-        return Ok(contatoExcluido);
+        var contatoExcluidoDto = _mapper.Map<ContatoDTO>(contatoExcluido);
+
+        return Ok(contatoExcluidoDto);
     }
 }
