@@ -21,7 +21,4 @@ public class Contato {
     [Phone(ErrorMessage = "O número de telefone informado não é válido.")]
     [StringLength(15, ErrorMessage = "O telefone deve ter no máximo 15 caracteres.")]
     public string? Telefone { get; set; }
-
-    [DataType(DataType.Date, ErrorMessage = "Data de nascimento inválida.")]
-    public DateOnly? Aniversario { get; set; } = null;
 }

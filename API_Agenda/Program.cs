@@ -11,12 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped<IValidaEmail, ValidaEmail>();
-builder.Services.AddScoped<IValidaAniversario, ValidaAniversario>();
 builder.Services.AddScoped<IValidaTelefone, ValidaTelefone>();
 builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 builder.Services.AddScoped<IValidadorContato, ValidadorContato>();
 builder.Services.AddScoped<IUnitOfwork, UnitOfWork>();
+builder.Services.AddAutoMapper(typeof(UnitOfWork)); 
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 { LogLevel = LogLevel.Information }));
