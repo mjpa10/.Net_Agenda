@@ -14,9 +14,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IValidaEmail, ValidaEmail>();
 builder.Services.AddScoped<IValidaAniversario, ValidaAniversario>();
 builder.Services.AddScoped<IValidaTelefone, ValidaTelefone>();
-builder.Services.AddScoped<IActionFilter, ApiLoggingFilter>();
 builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 builder.Services.AddScoped<IValidadorContato, ValidadorContato>();
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{ LogLevel = LogLevel.Information }));
 
 string? mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 

@@ -13,17 +13,22 @@ public class ContatosController : ControllerBase
 {
     private readonly IValidadorContato _validadorContato;
     private readonly IContatoRepository _repository;
+    private readonly ILogger _logger;
 
     public ContatosController(IContatoRepository repository,
-                               IValidadorContato validadorContato)
+                               IValidadorContato validadorContato,
+                               ILogger<ContatosController> logger)
     {
         _validadorContato = validadorContato;
         _repository = repository;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Contato>>> Get()
     {
+        _logger.LogInformation("=====Get api/Contatos ========");
+
        var contatos = await _repository.GetAllAsync();
 
        return Ok(contatos);
@@ -32,6 +37,8 @@ public class ContatosController : ControllerBase
     [HttpGet("{id:int}", Name="ObterContato")]
     public async Task<ActionResult<Contato>> GetByIdAsync(int id)
     {
+        _logger.LogInformation($"=====Get api/Contatos/id = {id} ========");
+
         var contato = await _repository.GetContatoAsync(id);
         
         if (contato == null) 
