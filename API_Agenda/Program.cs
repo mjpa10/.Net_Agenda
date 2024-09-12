@@ -16,6 +16,8 @@ builder.Services.AddScoped<IValidaAniversario, ValidaAniversario>();
 builder.Services.AddScoped<IValidaTelefone, ValidaTelefone>();
 builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 builder.Services.AddScoped<IValidadorContato, ValidadorContato>();
+builder.Services.AddScoped<IUnitOfwork, UnitOfWork>();
+
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 { LogLevel = LogLevel.Information }));
 

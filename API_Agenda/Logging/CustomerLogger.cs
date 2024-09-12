@@ -30,7 +30,7 @@ public class CustomerLogger : ILogger
     public void EscreverTextoNoArquivo(string mensagem)
     {
         // Defina o caminho completo para o arquivo de log no diretório atual
-        string caminhoLog = "Log.txt";
+        string caminhoLog = "log/Log.txt";
 
         // Escreve a mensagem no arquivo de log
         try

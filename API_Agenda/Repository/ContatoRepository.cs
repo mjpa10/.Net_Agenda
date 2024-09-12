@@ -27,20 +27,12 @@ public class ContatoRepository : IContatoRepository
 
     public Contato Create(Contato contato)
     {
-        if (contato == null)
-            throw new ArgumentNullException(nameof(contato));
-
         _context.Contatos.Add(contato);
-        _context.SaveChanges();
         return contato;
     }
     public Contato Update(Contato contato)
-    {
-        if(contato == null)
-            throw new ArgumentNullException(nameof(contato));
-
+    {      
         _context.Entry(contato).State = EntityState.Modified;
-        _context.SaveChanges();
 
         return contato;
     }
@@ -53,7 +45,6 @@ public class ContatoRepository : IContatoRepository
             throw new ArgumentNullException(nameof(contato));
 
         _context.Contatos.Remove(contato);
-        _context.SaveChanges();
         return contato;
     }
 

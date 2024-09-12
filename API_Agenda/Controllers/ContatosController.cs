@@ -12,16 +12,16 @@ namespace API_Agenda.Controllers;
 public class ContatosController : ControllerBase
 {
     private readonly IValidadorContato _validadorContato;
-    private readonly IContatoRepository _repository;
+    private readonly IUnitOfwork _uof;
     private readonly ILogger _logger;
 
-    public ContatosController(IContatoRepository repository,
+    public ContatosController(IUnitOfwork uof,
                                IValidadorContato validadorContato,
                                ILogger<ContatosController> logger)
     {
         _validadorContato = validadorContato;
-        _repository = repository;
         _logger = logger;
+        _uof = uof;
     }
 
     [HttpGet]
@@ -29,7 +29,7 @@ public class ContatosController : ControllerBase
     {
         _logger.LogInformation("=====Get api/Contatos ========");
 
-       var contatos = await _repository.GetAllAsync();
+       var contatos = await _uof.ContatoRepository.GetAllAsync();
 
        return Ok(contatos);
     }
@@ -39,10 +39,10 @@ public class ContatosController : ControllerBase
     {
         _logger.LogInformation($"=====Get api/Contatos/id = {id} ========");
 
-        var contato = await _repository.GetContatoAsync(id);
+        var contato = await _uof.ContatoRepository.GetContatoAsync(id);
         
-        if (contato == null) 
-            return NotFound("Contato não encontrado...");
+        if (contato == null)
+            return NotFound($"contato com id={id} não encontrado...");
 
         return Ok(contato);
     }
@@ -50,7 +50,6 @@ public class ContatosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Contato>> PostAsync([FromBody]Contato contato)
     {
-
         if (contato == null)
             return BadRequest("Dados Inválidos");
 
@@ -59,19 +58,22 @@ public class ContatosController : ControllerBase
         if (erros.Any())
             return Conflict(string.Join("\n", erros));//exibe todos os erros da criacao, separados por uma quebra de linha
 
-        var contatoCriado = _repository.Create(contato);
+        var contatoCriado = _uof.ContatoRepository.Create(contato);
+        _uof.Commit();
 
         return new CreatedAtRouteResult("ObterContato",
             new { id = contatoCriado.Id }, contatoCriado);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<Contato>> PutAsync(int id,[FromBody] Contato contato)
+    public async Task<ActionResult<Contato>> PutAsync(int id,Contato contato)
     {
-        if (id != contato.Id)
-            return BadRequest("Identidicadores diferentes");
 
-       _repository.Update(contato);        
+        if (id != contato.Id)
+            return BadRequest("Dados invalidos");
+
+        _uof.ContatoRepository.Update(contato);
+         _uof.Commit();
 
         return Ok(contato);
     }
@@ -79,12 +81,13 @@ public class ContatosController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<Contato>> Delete(int id)
     {
-        var contato = await _repository.GetContatoAsync(id);
+        var contato = await _uof.ContatoRepository.GetContatoAsync(id);
 
         if (contato is null)
-            return NotFound("contato não encontrado...");
+            return NotFound($"contato com id={id} não encontrado...");
 
-        var contatoExcluido = _repository.Delete(id);
+        var contatoExcluido = _uof.ContatoRepository.Delete(id);
+        _uof.Commit();
 
         return Ok(contatoExcluido);
     }
