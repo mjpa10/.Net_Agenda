@@ -49,12 +49,11 @@ public class ContatoRepository : IContatoRepository
         return contato;
     }
 
-    public IEnumerable<Contato> GetContatos(ContatosParameters contatosParameters)
+    public PagedList<Contato> GetContatos(ContatosParameters contatosParameters)
     {
-        return GetAll()
-            .OrderBy(c => c.Nome)
-            .Skip((contatosParameters.PageNumber - 1)* contatosParameters.PageSize)
-            .Take(contatosParameters.PageSize).ToList();
+        var contatos =  GetAll().OrderBy(c => c.Nome).AsQueryable();
+        var contatosOrdenados = PagedList<Contato>.ToPagedList(contatos, contatosParameters.PageNumber, contatosParameters.PageSize);
+        return contatosOrdenados;
     }
 
 }

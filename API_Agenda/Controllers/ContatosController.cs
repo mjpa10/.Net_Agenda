@@ -3,9 +3,9 @@ using API_Agenda.Models;
 using API_Agenda.Pagination;
 using API_Agenda.Repository;
 using API_Agenda.Services;
-using APIAgenda.Context;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace API_Agenda.Controllers;
 
@@ -110,6 +110,17 @@ public class ContatosController : ControllerBase
     {
         var contatos =  _uof.ContatoRepository.GetContatos(contatosParameters);
 
+        var metadata = new
+        {
+            contatos.TotalCount,
+            contatos.PageSize,
+            contatos.CurrentPage,
+            contatos.TotalPages,
+            contatos.HasNext,
+            contatos.HasPrevious,
+        };
+        Response.Headers.Append("X-Pagination",JsonConvert.SerializeObject(metadata));
+        
         var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
         return Ok(contatos);
     }
