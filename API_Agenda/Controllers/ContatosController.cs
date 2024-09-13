@@ -1,5 +1,6 @@
 ﻿using API_Agenda.DTOs;
 using API_Agenda.Models;
+using API_Agenda.Pagination;
 using API_Agenda.Repository;
 using API_Agenda.Services;
 using APIAgenda.Context;
@@ -28,7 +29,7 @@ public class ContatosController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ContatoDTO>>> Get()
     {        
-       var contatos = await _uof.ContatoRepository.GetAllAsync();
+       var contatos =  _uof.ContatoRepository.GetAll();
 
        var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
 
@@ -100,5 +101,16 @@ public class ContatosController : ControllerBase
         var contatoExcluidoDto = _mapper.Map<ContatoDTO>(contatoExcluido);
 
         return Ok(contatoExcluidoDto);
+    }
+
+    //pagination
+    [HttpGet("pagiation")]
+    public ActionResult<IEnumerable<ContatoDTO>> Get([FromQuery]
+                                ContatosParameters contatosParameters)
+    {
+        var contatos =  _uof.ContatoRepository.GetContatos(contatosParameters);
+
+        var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+        return Ok(contatos);
     }
 }

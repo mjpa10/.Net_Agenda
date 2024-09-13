@@ -1,4 +1,5 @@
 ﻿using API_Agenda.Models;
+using API_Agenda.Pagination;
 using API_Agenda.Services;
 using APIAgenda.Context;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,9 @@ public class ContatoRepository : IContatoRepository
         _context = context;
        
     }
-    public async Task<IEnumerable<Contato>> GetAllAsync()
+    public IEnumerable<Contato> GetAll()
     {
-        return await _context.Contatos.ToListAsync();
+        return  _context.Contatos.ToList();
     }
     public async Task<Contato?> GetContatoAsync(int id)
     {
@@ -46,6 +47,14 @@ public class ContatoRepository : IContatoRepository
 
         _context.Contatos.Remove(contato);
         return contato;
+    }
+
+    public IEnumerable<Contato> GetContatos(ContatosParameters contatosParameters)
+    {
+        return GetAll()
+            .OrderBy(c => c.Nome)
+            .Skip((contatosParameters.PageNumber - 1)* contatosParameters.PageSize)
+            .Take(contatosParameters.PageSize).ToList();
     }
 
 }
