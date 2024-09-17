@@ -3,7 +3,8 @@ using API_Agenda.Pagination;
 using API_Agenda.Services;
 using APIAgenda.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
+using X.PagedList;
+
 
 namespace API_Agenda.Repository;
 
@@ -49,7 +50,7 @@ public class ContatoRepository : IContatoRepository
         return contato;
     }
 
-    public async Task<PagedList<Contato>> GetContatosAsync(ContatosParameters contatosParameters, string? searchTerm = null)
+    public async Task<IPagedList<Contato>> GetContatosAsync(ContatosParameters contatosParameters, string? searchTerm = null)
     {
         var contatos = await GetAllAsync();
 
@@ -58,12 +59,19 @@ public class ContatoRepository : IContatoRepository
         // Se o parâmetro de busca (searchTerm) não for nulo ou vazio, aplica o filtro.
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            contatosOrdenados = contatosOrdenados.Where(c => c.Nome.Contains(searchTerm) || // Filtro por nome
-                                                  c.Email.Contains(searchTerm) || // Filtro por e-mail
-                                                  c.Telefone.Contains(searchTerm)); // Filtro por telefone
+            //Este método procura a substring(searchTerm) em cada campo(Nome, Email, Telefone) do contato.
+            // O método IndexOf é usado para localizar a substring, ignorando se as letras são maiúsculas ou minúsculas.
+            // Retorna um índice maior ou igual a 0 se a substring for encontrada em qualquer posição do texto.
+            // Caso contrário, retorna -1.
+            contatosOrdenados = contatosOrdenados.Where(c =>
+                  c.Nome.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 || // Filtro por nome
+                  c.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 || // Filtro por e-mail
+                  c.Telefone.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0); // Filtro por telefone
         }
+
         // Aplica a paginação aos contatos filtrados e ordenados.
-        var resultado = PagedList<Contato>.ToPagedList(contatosOrdenados, contatosParameters.PageNumber, contatosParameters.PageSize);
+        var resultado = await contatosOrdenados.ToPagedListAsync(contatosParameters.PageNumber,
+                                                        contatosParameters.PageSize);
         return resultado;
     }
 

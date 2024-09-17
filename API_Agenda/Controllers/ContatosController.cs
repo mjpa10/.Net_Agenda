@@ -6,6 +6,7 @@ using API_Agenda.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using X.PagedList;
 
 namespace API_Agenda.Controllers;
 
@@ -114,22 +115,27 @@ public class ContatosController : ControllerBase
         // Obtém os contatos do repositório aplicando os parâmetros de paginação e o termo de busca (se houver).
         var contatos = await  _uof.ContatoRepository.GetContatosAsync(contatosParameters, searchTerm);
 
+        return ObterContatos(contatos);  
+    }
+
+    private ActionResult<IEnumerable<ContatoDTO>> ObterContatos(IPagedList<Contato> contatos)
+    {
         // Cria um objeto contendo os metadados de paginação (número total de itens, tamanho da página, etc.).
         var metadata = new
-         {
-              contatos.TotalCount,
-              contatos.PageSize,
-              contatos.CurrentPage,
-              contatos.TotalPages,
-              contatos.HasNext,
-              contatos.HasPrevious,
-         };
-         // Adiciona os metadados de paginação no cabeçalho da resposta.
-         Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+        {
+            contatos.Count,
+            contatos.PageSize,
+            contatos.PageCount,
+            contatos.TotalItemCount,
+            contatos.HasNextPage,
+            contatos.HasPreviousPage,
+        };
+        // Adiciona os metadados de paginação no cabeçalho da resposta.
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
 
-         var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+        var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
 
-         return Ok(contatos);
-        
+        return Ok(contatosDto);
+
     }
 }
