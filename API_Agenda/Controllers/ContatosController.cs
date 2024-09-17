@@ -28,23 +28,26 @@ public class ContatosController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ContatoDTO>>> Get()
-    {        
-       var contatos =  _uof.ContatoRepository.GetAll();
+    {
+        var contatos = await  _uof.ContatoRepository.GetAllAsync();
 
-       var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+        if (contatos is null)
+            return NotFound("Não existem contatos...");
 
-       return Ok(contatosDto);
+        var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+
+        return Ok(contatosDto);
     }
 
 
-    [HttpGet("{id:int}", Name="ObterContato")]
+    [HttpGet("{id:int}", Name = "ObterContato")]
     public async Task<ActionResult<ContatoDTO>> GetByIdAsync(int id)
-    {        
-        var contato = await _uof.ContatoRepository.GetContatoAsync(id);        
+    {
+        var contato = await _uof.ContatoRepository.GetContatoAsync(id);
         if (contato == null)
             return NotFound($"contato com id={id} não encontrado...");
 
-        var contatoDto = _mapper.Map<ContatoDTO>(contato); 
+        var contatoDto = _mapper.Map<ContatoDTO>(contato);
 
         return Ok(contatoDto);
     }
@@ -63,7 +66,7 @@ public class ContatosController : ControllerBase
             return Conflict(string.Join("\n", erros));//exibe todos os erros da criacao, separados por uma quebra de linha
 
         var contatoCriado = _uof.ContatoRepository.Create(contato);
-        _uof.Commit();
+        await _uof.CommitAsync();
 
         var contatoCriadoDto = _mapper.Map<ContatoDTO>(contatoCriado);
 
@@ -80,7 +83,7 @@ public class ContatosController : ControllerBase
         var contato = _mapper.Map<Contato>(contatoDTO);
 
         _uof.ContatoRepository.Update(contato);
-         _uof.Commit();
+        await _uof.CommitAsync();
 
         var produtoAtualizadoDto = _mapper.Map<ContatoDTO>(contato);
 
@@ -96,7 +99,7 @@ public class ContatosController : ControllerBase
             return NotFound($"contato com id={id} não encontrado...");
 
         var contatoExcluido = _uof.ContatoRepository.Delete(id);
-        _uof.Commit();
+        await _uof.CommitAsync();
 
         var contatoExcluidoDto = _mapper.Map<ContatoDTO>(contatoExcluido);
 
@@ -104,24 +107,29 @@ public class ContatosController : ControllerBase
     }
 
     //pagination
-    [HttpGet("pagiation")]
-    public ActionResult<IEnumerable<ContatoDTO>> Get([FromQuery]
-                                ContatosParameters contatosParameters)
-    {
-        var contatos =  _uof.ContatoRepository.GetContatos(contatosParameters);
+    [HttpGet("Filtrar")]
+    public async Task<ActionResult<IEnumerable<ContatoDTO>>> GetFiltradoAsync([FromQuery] ContatosParameters contatosParameters,  // Parâmetros de paginação (número da página, tamanho da página).
+                                                                              [FromQuery] string? searchTerm = null) // Parâmetro opcional para o termo de busca.
+    {    
+        // Obtém os contatos do repositório aplicando os parâmetros de paginação e o termo de busca (se houver).
+        var contatos = await  _uof.ContatoRepository.GetContatosAsync(contatosParameters, searchTerm);
 
+        // Cria um objeto contendo os metadados de paginação (número total de itens, tamanho da página, etc.).
         var metadata = new
-        {
-            contatos.TotalCount,
-            contatos.PageSize,
-            contatos.CurrentPage,
-            contatos.TotalPages,
-            contatos.HasNext,
-            contatos.HasPrevious,
-        };
-        Response.Headers.Append("X-Pagination",JsonConvert.SerializeObject(metadata));
+         {
+              contatos.TotalCount,
+              contatos.PageSize,
+              contatos.CurrentPage,
+              contatos.TotalPages,
+              contatos.HasNext,
+              contatos.HasPrevious,
+         };
+         // Adiciona os metadados de paginação no cabeçalho da resposta.
+         Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+         var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+
+         return Ok(contatos);
         
-        var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
-        return Ok(contatos);
     }
 }

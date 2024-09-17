@@ -4,5 +4,5 @@ public interface IUnitOfwork
 {
    IContatoRepository ContatoRepository { get; }
 
-    void Commit();
+    Task CommitAsync();
 }

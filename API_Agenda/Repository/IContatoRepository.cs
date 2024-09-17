@@ -6,8 +6,9 @@ namespace API_Agenda.Repository;
 
 public interface IContatoRepository
 {
-    PagedList<Contato> GetContatos(ContatosParameters contatosParams);
-    IEnumerable<Contato> GetAll();
+
+    Task<PagedList<Contato>> GetContatosAsync(ContatosParameters contatosParams, string? searchTerm = null);
+    Task<IEnumerable<Contato>> GetAllAsync();
     Task<Contato?> GetContatoAsync(int id);
     Contato Create(Contato contato);
     Contato Update(Contato contato);

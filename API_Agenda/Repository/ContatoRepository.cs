@@ -17,9 +17,9 @@ public class ContatoRepository : IContatoRepository
         _context = context;
        
     }
-    public IEnumerable<Contato> GetAll()
+    public async Task<IEnumerable<Contato>> GetAllAsync()
     {
-        return  _context.Contatos.ToList();
+        return  await _context.Contatos.ToListAsync();
     }
     public async Task<Contato?> GetContatoAsync(int id)
     {
@@ -49,11 +49,22 @@ public class ContatoRepository : IContatoRepository
         return contato;
     }
 
-    public PagedList<Contato> GetContatos(ContatosParameters contatosParameters)
+    public async Task<PagedList<Contato>> GetContatosAsync(ContatosParameters contatosParameters, string? searchTerm = null)
     {
-        var contatos =  GetAll().OrderBy(c => c.Nome).AsQueryable();
-        var contatosOrdenados = PagedList<Contato>.ToPagedList(contatos, contatosParameters.PageNumber, contatosParameters.PageSize);
-        return contatosOrdenados;
+        var contatos = await GetAllAsync();
+
+        var contatosOrdenados = contatos.OrderBy(c => c.Nome).AsQueryable();
+
+        // Se o parâmetro de busca (searchTerm) não for nulo ou vazio, aplica o filtro.
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            contatosOrdenados = contatosOrdenados.Where(c => c.Nome.Contains(searchTerm) || // Filtro por nome
+                                                  c.Email.Contains(searchTerm) || // Filtro por e-mail
+                                                  c.Telefone.Contains(searchTerm)); // Filtro por telefone
+        }
+        // Aplica a paginação aos contatos filtrados e ordenados.
+        var resultado = PagedList<Contato>.ToPagedList(contatosOrdenados, contatosParameters.PageNumber, contatosParameters.PageSize);
+        return resultado;
     }
 
 }
