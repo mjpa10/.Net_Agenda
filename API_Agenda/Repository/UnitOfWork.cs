@@ -7,7 +7,7 @@ namespace API_Agenda.Repository
         private AppDbContext _context;
 
         // Repositório de contatos, que será inicializado conforme necessário.
-        private IContatoRepository _contatoRepo;
+        private IContatoRepository? _contatoRepo;
 
         public UnitOfWork(AppDbContext context)
         {

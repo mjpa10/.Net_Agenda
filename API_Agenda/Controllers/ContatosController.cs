@@ -7,11 +7,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using X.PagedList;
+using Microsoft.AspNetCore.Http;
 
 namespace API_Agenda.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Produces("aplication/json")]
 public class ContatosController : ControllerBase
 {
     private readonly IValidadorContato _validadorContato;
@@ -27,7 +29,14 @@ public class ContatosController : ControllerBase
         _uof = uof;
     }
 
+    /// <summary>
+    /// Obtem uma lista de contatos
+    /// </summary>
+    /// <returns>Uma lista de objetos ContatoDTO.</returns>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<IEnumerable<ContatoDTO>>> Get()
     {
         var contatos = await  _uof.ContatoRepository.GetAllAsync();
@@ -40,8 +49,15 @@ public class ContatosController : ControllerBase
         return Ok(contatosDto);
     }
 
-
+    /// <summary>
+    /// Obtém um contato pelo ID.
+    /// </summary>
+    /// <param name="id">ID do contato a ser buscado.</param>
+    /// <returns>O contato correspondente ao ID fornecido.</returns>
     [HttpGet("{id:int}", Name = "ObterContato")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<ContatoDTO>> GetByIdAsync(int id)
     {
         var contato = await _uof.ContatoRepository.GetContatoAsync(id);
@@ -53,7 +69,26 @@ public class ContatosController : ControllerBase
         return Ok(contatoDto);
     }
 
+    /// <summary>
+    /// Cria um novo contato.
+    /// </summary>
+    /// <remarks>
+    /// Exemplo de request
+    ///         
+    ///         POST api/contatos
+    ///          {
+    ///             "nome": "nome1",
+    ///              "email": "user@example.com",
+    ///               "telefone": "0000000"
+    ///           }          
+    /// </remarks>
+    /// <param name="contatoDTO">Objeto ContatoDTO contendo os dados do novo contato.</param>
+    /// <returns>O contato criado com seu ID gerado.</returns>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<ContatoDTO>> PostAsync([FromBody] ContatoDTO contatoDTO)
     {
         if (contatoDTO == null)
@@ -75,7 +110,16 @@ public class ContatosController : ControllerBase
             new { id = contatoCriadoDto.Id }, contatoCriadoDto);
     }
 
+    /// <summary>
+    /// Atualiza um contato existente.
+    /// </summary>
+    /// <param name="id">ID do contato a ser atualizado.</param>
+    /// <param name="contatoDTO">Objeto ContatoDTO com os dados atualizados.</param>
+    /// <returns>O contato atualizado.</returns>
     [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<ContatoDTO>> PutAsync(int id, ContatoDTO contatoDTO)
     {
         if (id != contatoDTO.Id)
@@ -91,7 +135,15 @@ public class ContatosController : ControllerBase
         return Ok(produtoAtualizadoDto);
     }
 
+    /// <summary>
+    /// Exclui um contato pelo ID.
+    /// </summary>
+    /// <param name="id">ID do contato a ser excluído.</param>
+    /// <returns>O contato excluído.</returns>v
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType]
     public async Task<ActionResult<ContatoDTO>> Delete(int id)
     {
         var contato = await _uof.ContatoRepository.GetContatoAsync(id);
@@ -107,6 +159,12 @@ public class ContatosController : ControllerBase
         return Ok(contatoExcluidoDto);
     }
 
+    /// <summary>
+    /// Filtra e pagina os contatos.
+    /// </summary>
+    /// <param name="contatosParameters">Parâmetros de paginação (número da página, tamanho da página).</param>
+    /// <param name="searchTerm">Parâmetro opcional para filtrar por nome, e-mail ou telefone.</param>
+    /// <returns>Uma lista paginada de objetos ContatoDTO com os filtros aplicados.</returns>
     //pagination
     [HttpGet("Filtrar")]
     public async Task<ActionResult<IEnumerable<ContatoDTO>>> GetFiltradoAsync([FromQuery] ContatosParameters contatosParameters,  // Parâmetros de paginação (número da página, tamanho da página).
@@ -118,6 +176,7 @@ public class ContatosController : ControllerBase
         return ObterContatos(contatos);  
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
     private ActionResult<IEnumerable<ContatoDTO>> ObterContatos(IPagedList<Contato> contatos)
     {
         // Cria um objeto contendo os metadados de paginação (número total de itens, tamanho da página, etc.).

@@ -4,6 +4,8 @@ using API_Agenda.Repository;
 using API_Agenda.Services;
 using APIAgenda.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen( c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "APIAgenda",
+        Description = "Agenda de Contatos",
+        Contact = new OpenApiContact
+        {
+            Name = "Matheus José",
+            Email = "m.theus.jose.pereira@gmail.com",
+            Url = new Uri("https://www.linkedin.com/in/matheus-josee/")
+        }
+    });
+
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
+});
 
 builder.Services.AddScoped<IValidaEmail, ValidaEmail>();
 builder.Services.AddScoped<IValidaTelefone, ValidaTelefone>();
