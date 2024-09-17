@@ -1,0 +1,91 @@
+﻿using API_Agenda.Controllers;
+using API_Agenda.DTOs;
+using FluentAssertions;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+
+namespace APIAgendaxUnitTests.UnitTests;
+
+public class GetContatosUnitTests : IClassFixture<ContatosUnitTestController>
+{
+    private readonly ContatosController _controller;
+    public GetContatosUnitTests(ContatosUnitTestController controller)
+    {
+        _controller = new ContatosController(controller.repository, controller.validadorContato, controller.mapper);
+    }
+
+    [Fact]
+    public async Task GetAall_OKResult()
+    {
+        //act
+        var data = await _controller.Get();
+
+        //Assert
+        data.Result.Should().BeOfType<OkObjectResult>()
+             .Which.Value.Should().BeAssignableTo<IEnumerable<ContatoDTO>>()
+             .And.NotBeNull();
+    }
+
+    [Fact]
+    public async Task GetAall_BadRequest()
+    {
+        //act
+        var data = await _controller.Get();
+
+        //Assert
+        data.Result.Should().BeOfType<BadRequestResult>();
+    }
+
+    [Fact]
+    public async Task GetAall_NotFound()
+    { 
+        //act
+        var data = await _controller.Get();
+
+        //Assert
+        data.Result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task GetId_OKResult()
+    {
+        //Arrange
+        var id = 3;
+
+        //act
+        var data = await _controller.GetByIdAsync(id);
+
+        //Assert
+        data.Result.Should().BeOfType<OkObjectResult>()
+             .Which.StatusCode.Should().Be(200);
+    }
+
+    [Fact]
+    public async Task GetId_NotFound()
+    {
+        //Arrange
+        var id = 999;
+
+        //act
+        var data = await _controller.GetByIdAsync(id);
+
+        //Assert
+        data.Result.Should().BeOfType<NotFoundObjectResult>()
+             .Which.StatusCode.Should().Be(404);
+    }
+
+    [Fact]
+    public async Task GetId_BadRequest()
+    {
+        //Arrange
+        var id = 0;
+
+        //act
+        var data = await _controller.GetByIdAsync(id);
+
+        //Assert
+        data.Result.Should().BeOfType<BadRequestObjectResult>()
+             .Which.StatusCode.Should().Be(400);
+    }
+
+}

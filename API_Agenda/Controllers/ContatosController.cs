@@ -36,17 +36,26 @@ public class ContatosController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesDefaultResponseType]
     public async Task<ActionResult<IEnumerable<ContatoDTO>>> Get()
     {
-        var contatos = await  _uof.ContatoRepository.GetAllAsync();
+        try
+        {
+            var contatos = await _uof.ContatoRepository.GetAllAsync();
 
-        if (contatos is null)
-            return NotFound("Não existem contatos...");
+            if (contatos is null)
+                return NotFound("Não existem contatos...");
 
-        var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
+            var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
 
-        return Ok(contatosDto);
+            return Ok(contatosDto);
+        }
+        catch
+        {
+            return NotFound();
+        }
+       
     }
 
     /// <summary>
@@ -57,9 +66,15 @@ public class ContatosController : ControllerBase
     [HttpGet("{id:int}", Name = "ObterContato")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesDefaultResponseType]
     public async Task<ActionResult<ContatoDTO>> GetByIdAsync(int id)
     {
+        if (id == null || id <=0)
+        {  
+            return BadRequest("Id de Contato inválido");
+        }
+
         var contato = await _uof.ContatoRepository.GetContatoAsync(id);
         if (contato == null)
             return NotFound($"contato com id={id} não encontrado...");
