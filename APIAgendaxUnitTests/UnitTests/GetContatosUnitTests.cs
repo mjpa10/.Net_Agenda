@@ -1,5 +1,6 @@
 ﻿using API_Agenda.Controllers;
 using API_Agenda.DTOs;
+using API_Agenda.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ public class GetContatosUnitTests : IClassFixture<ContatosUnitTestController>
     private readonly ContatosController _controller;
     public GetContatosUnitTests(ContatosUnitTestController controller)
     {
-        _controller = new ContatosController(controller.repository, controller.validadorContato, controller.mapper);
+        _controller = new ContatosController(controller.repository, controller.validadorContatoMock.Object, controller.mapper);
     }
 
     [Fact]
@@ -38,12 +39,13 @@ public class GetContatosUnitTests : IClassFixture<ContatosUnitTestController>
 
     [Fact]
     public async Task GetAall_NotFound()
-    { 
-        //act
-        var data = await _controller.Get();
+    {
+       
+        // Act
+        var result = await _controller.Get();
 
-        //Assert
-        data.Result.Should().BeOfType<NotFoundResult>();
+        // Assert
+        result.Result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]

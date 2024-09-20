@@ -5,14 +5,14 @@ using API_Agenda.Services;
 using APIAgenda.Context;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.Intrinsics.X86;
-
+using Moq;
 namespace APIAgendaxUnitTests.UnitTests;
 
 public class ContatosUnitTestController
 {
     public IUnitOfwork repository;
     public IMapper mapper;
+    public Mock<IValidadorContato> validadorContatoMock;
 
     public static DbContextOptions<AppDbContext> dbContextOptions { get; }
 
@@ -45,5 +45,12 @@ public class ContatosUnitTestController
 
         // Criação de uma instância do repositório (UnitOfWork), que será usada para manipular os dados no banco de dados
         repository = new UnitOfWork(context);
+
+        // Mock do ValidadorContato
+        validadorContatoMock = new Mock<IValidadorContato>();
+
+        // Configuração padrão do mock para retornar uma lista vazia (nenhum erro)
+        validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>()))
+            .ReturnsAsync(new List<string>());
     }
 }
