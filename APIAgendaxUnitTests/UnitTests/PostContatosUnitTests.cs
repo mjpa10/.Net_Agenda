@@ -10,11 +10,11 @@ using Moq;
 namespace APIAgendaxUnitTests.UnitTests;
 
 
-public class PostContatoUnitTests : IClassFixture<ContatosUnitTestController>
+public class PostContatosUnitTests : IClassFixture<ContatosUnitTestController>
 {
     private readonly ContatosController _controller;
     private readonly Mock<IValidadorContato> _validadorContatoMock;
-    public PostContatoUnitTests(ContatosUnitTestController controller)
+    public PostContatosUnitTests(ContatosUnitTestController controller)
     {
         _controller = new ContatosController(controller.repository, controller.validadorContatoMock.Object, controller.mapper);
         _validadorContatoMock = controller.validadorContatoMock;
@@ -29,13 +29,6 @@ public class PostContatoUnitTests : IClassFixture<ContatosUnitTestController>
             Nome = "Matheus",
             Telefone = "819956608880",
             Email = "M.theus.jose.pereira@gmail.com"
-        };
-
-        var contato = new Contato
-        {
-            Nome = novoContatoDto.Nome,
-            Telefone = novoContatoDto.Telefone,
-            Email = novoContatoDto.Email
         };
 
         // Configurar o validador para não retornar erros

@@ -13,7 +13,7 @@ namespace API_Agenda.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Produces("aplication/json")]
+[Produces("application/json")]
 public class ContatosController : ControllerBase
 {
     private readonly IValidadorContato _validadorContato;
@@ -35,13 +35,9 @@ public class ContatosController : ControllerBase
     /// <returns>Uma lista de objetos ContatoDTO.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesDefaultResponseType]
     public async Task<ActionResult<IEnumerable<ContatoDTO>>> Get()
-    {
-        try
-        {
+    {       
             var contatos = await _uof.ContatoRepository.GetAllAsync();
 
             if (contatos is null)
@@ -50,12 +46,7 @@ public class ContatosController : ControllerBase
             var contatosDto = _mapper.Map<IEnumerable<ContatoDTO>>(contatos);
 
             return Ok(contatosDto);
-        }
-        catch
-        {
-            return NotFound();
-        }
-       
+              
     }
 
     /// <summary>
@@ -134,6 +125,7 @@ public class ContatosController : ControllerBase
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
     [ProducesDefaultResponseType]
     public async Task<ActionResult<ContatoDTO>> PutAsync(int id, ContatoDTO contatoDTO)
     {
@@ -141,6 +133,12 @@ public class ContatosController : ControllerBase
             return BadRequest("Dados invalidos");
 
         var contato = _mapper.Map<Contato>(contatoDTO);
+
+        var erros = await _validadorContato.ValidarContatoAsync(contato); //um contador de erros para que todos sejam exibidos
+
+        if (erros.Any())
+            return Conflict(string.Join("/n", erros));//exibe todos os erros da criacao, separados por uma quebra de linha
+
 
         _uof.ContatoRepository.Update(contato);
         await _uof.CommitAsync();

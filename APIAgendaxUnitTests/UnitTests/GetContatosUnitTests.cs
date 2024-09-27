@@ -27,32 +27,12 @@ public class GetContatosUnitTests : IClassFixture<ContatosUnitTestController>
              .And.NotBeNull();
     }
 
-    [Fact]
-    public async Task GetAall_BadRequest()
-    {
-        //act
-        var data = await _controller.Get();
-
-        //Assert
-        data.Result.Should().BeOfType<BadRequestResult>();
-    }
-
-    [Fact]
-    public async Task GetAall_NotFound()
-    {
-       
-        // Act
-        var result = await _controller.Get();
-
-        // Assert
-        result.Result.Should().BeOfType<NotFoundResult>();
-    }
 
     [Fact]
     public async Task GetId_OKResult()
     {
         //Arrange
-        var id = 3;
+        var id = 10;
 
         //act
         var data = await _controller.GetByIdAsync(id);
