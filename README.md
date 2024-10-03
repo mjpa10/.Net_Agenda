@@ -78,7 +78,7 @@ Inicie sua IDE e abra o arquivo de solução (.sln) que corresponde ao projeto, 
 
 ### 5. Compile o Projeto:
 
-Na IDE, localize e selecione a opção para compilar o projeto. Normalmente, isso pode ser feito clicando com o botão direito no arquivo de solução ou projeto no Gerenciador de Soluções e selecionando "Compilar" ou "Build".
+Na IDE, localize e selecione a opção para compilar o projeto. Normalmente, isso pode ser feito clicando com o botão direito no arquivo de solução ou projeto no Gerenciador de Soluções e selecionando "Compilar" ou "Build". Compile com o Http
 
 ### 6. Inicie o Projeto:
 
