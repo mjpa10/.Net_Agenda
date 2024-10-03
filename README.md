@@ -15,7 +15,6 @@ Este projeto é uma API para gerenciamento de contatos, que garante que os conta
 - **MySQL: Banco de dados utilizado para armazenar os lembretes.**
 - **AutoMapper: Biblioteca para mapeamento automático entre objetos.**
 - **Swagger: Ferramenta para documentação interativa da API.**
-- **JWT (JSON Web Token): Utilizado para autenticação e autorização de usuários na API.**
 
 ## Pré-requisitos
 
