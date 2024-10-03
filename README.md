@@ -44,7 +44,7 @@ dotnet restore
 ```bash
 cd API_Agenda
 ```
-### 3. Configurando o Banco de Dados e o autenticador de tokens
+### 3. Configurando o Banco de Dados
 
 - Crie as configurações de conexão no arquivo `appsettings.json` dentro da pasta `\API_Agenda`, seguindo esse modelo:
   
