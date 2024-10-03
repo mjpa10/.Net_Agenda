@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using X.PagedList;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace API_Agenda.Controllers;
 
@@ -102,10 +103,12 @@ public class ContatosController : ControllerBase
 
         var contato = _mapper.Map<Contato>(contatoDTO);
 
-        var erros = await _validadorContato.ValidarContatoAsync(contato); //um contador de erros para que todos sejam exibidos
+        var erros = await _validadorContato.ValidarContatoAsync(contato, 0);  // O ID será 0, pois é um novo contato
 
         if (erros.Any())
-            return Conflict(string.Join("\n", erros));//exibe todos os erros da criacao, separados por uma quebra de linha
+        {
+            return Conflict(new ErrorResponse(erros)); // Retorna o dicionário de erros diretamente
+        }
 
         var contatoCriado = _uof.ContatoRepository.Create(contato);
         await _uof.CommitAsync();
@@ -134,11 +137,12 @@ public class ContatosController : ControllerBase
 
         var contato = _mapper.Map<Contato>(contatoDTO);
 
-        var erros = await _validadorContato.ValidarContatoAsync(contato); //um contador de erros para que todos sejam exibidos
+        var erros = await _validadorContato.ValidarContatoAsync(contato, id);
 
         if (erros.Any())
-            return Conflict(string.Join("/n", erros));//exibe todos os erros da criacao, separados por uma quebra de linha
-
+        {
+            return Conflict(new ErrorResponse(erros)); // Retorna o dicionário de erros diretamente
+        }
 
         _uof.ContatoRepository.Update(contato);
         await _uof.CommitAsync();

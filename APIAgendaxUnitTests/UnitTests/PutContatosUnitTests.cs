@@ -23,7 +23,7 @@ public class PutContatosUnitTests : IClassFixture<ContatosUnitTestController>
     public async Task Post_Created()
     {
         // Arrange
-        var contatoId = 8;
+        var contatoId = 45;
 
         var UpdateContatoDto = new ContatoDTO
         {
@@ -34,8 +34,8 @@ public class PutContatosUnitTests : IClassFixture<ContatosUnitTestController>
         };
 
         // Configurar o validador para não retornar erros
-        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>()))
-            .ReturnsAsync(new List<string>());
+        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>(), It.IsAny<int>()))
+            .ReturnsAsync(new Dictionary<string, string>());
 
         //act
         var result = await _controller.PutAsync(contatoId, UpdateContatoDto);
@@ -61,8 +61,10 @@ public class PutContatosUnitTests : IClassFixture<ContatosUnitTestController>
         };
 
         // Configurar o validador para retornar erros
-        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>()))
-            .ReturnsAsync(new List<string> { "Erro de validação" });
+        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>(), It.IsAny<int>()))
+            .ReturnsAsync(new Dictionary<string,string> {
+                    { "Email", "E-mail já cadastrado." }
+            });
 
         //act
         var result = await _controller.PutAsync(contatoId, UpdateContatoDto);

@@ -22,7 +22,7 @@ public class DeleteContatosUnitTest : IClassFixture<ContatosUnitTestController>
     public async Task Delete_ReturnOk()
     {
         // Arrange
-        var contatoId = 4;
+        var contatoId = 46;
 
         //act
        var result = await _controller.Delete(contatoId);

@@ -32,8 +32,8 @@ public class PostContatosUnitTests : IClassFixture<ContatosUnitTestController>
         };
 
         // Configurar o validador para não retornar erros
-        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>()))
-            .ReturnsAsync(new List<string>());
+        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>(), It.IsAny<int>()))
+               .ReturnsAsync(new Dictionary<string, string>()); // Retornar dicionário vazio (sem erros)
 
         //act
         var data = await _controller.PostAsync(novoContatoDto);
@@ -54,9 +54,12 @@ public class PostContatosUnitTests : IClassFixture<ContatosUnitTestController>
             Email = "M.theus.jose.pereira@gmail.com"
         };
 
-        // Configurar o validador para retornar erros
-        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>()))
-            .ReturnsAsync(new List<string> { "Erro de validação" });
+        // Configurar o validador para retornar erros de validação
+        _validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>(), It.IsAny<int>()))
+            .ReturnsAsync(new Dictionary<string, string>
+            {
+                    { "Email", "E-mail já cadastrado." }
+            });
 
         // Act
         var result = await _controller.PostAsync(novoContatoDto);
@@ -64,6 +67,11 @@ public class PostContatosUnitTests : IClassFixture<ContatosUnitTestController>
         // Assert
         var conflictResult = result.Result.Should().BeOfType<ConflictObjectResult>().Subject;
         conflictResult.StatusCode.Should().Be(409);
+
+        // Verificar o conteúdo do conflito (dicionário de erros)
+        var errorResponse = conflictResult.Value as ErrorResponse;
+        errorResponse.Errors.Should().ContainKey("Email");
+        errorResponse.Errors["Email"].Should().Be("E-mail já cadastrado.");
     }
 
     [Fact]

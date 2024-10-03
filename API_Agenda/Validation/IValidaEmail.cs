@@ -2,5 +2,5 @@
 
 public interface IValidaEmail
 {
-    public Task<bool> EmailJaExisteAsync(string email);
+    public Task<bool> EmailJaExisteAsync(string email, int contatoId);
 }

@@ -1,4 +1,5 @@
 ﻿
+using API_Agenda.Models;
 using APIAgenda.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +14,8 @@ public class ValidaEmail : IValidaEmail
         _context = context;
     }
 
-    public async Task<bool> EmailJaExisteAsync(string email)
+    public async Task<bool> EmailJaExisteAsync(string email, int contatoId)
     {
-        return await _context.Contatos.AnyAsync(a => a.Email == email);
+        return await _context.Contatos.AnyAsync(a => a.Email == email && a.Id != contatoId);
     }
 }

@@ -4,6 +4,7 @@ using API_Agenda.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace APIAgendaxUnitTests.UnitTests;
 
@@ -32,7 +33,7 @@ public class GetContatosUnitTests : IClassFixture<ContatosUnitTestController>
     public async Task GetId_OKResult()
     {
         //Arrange
-        var id = 10;
+        var id = 45; 
 
         //act
         var data = await _controller.GetByIdAsync(id);

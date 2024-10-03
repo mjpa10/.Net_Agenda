@@ -2,5 +2,5 @@
 
 public interface IValidaTelefone
 {
-    public Task<bool> ValidaTelefoneAsync(string telefone);
+    public Task<bool> ValidaTelefoneAsync(string telefone, int contatoId);
 }

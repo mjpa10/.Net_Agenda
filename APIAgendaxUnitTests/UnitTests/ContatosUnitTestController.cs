@@ -19,8 +19,8 @@ public class ContatosUnitTestController
     public static string connectionString =
         "Server=localhost;DataBase=Agenda;Uid=root;pwd=root";
 
-   // Este método estático é executado apenas uma vez quando a classe é carregada,
-   // Inicializando as opções do DbContext com a connection string e a versão do servidor detectada automaticamente
+    // Este método estático é executado apenas uma vez quando a classe é carregada,
+    // Inicializando as opções do DbContext com a connection string e a versão do servidor detectada automaticamente
     static ContatosUnitTestController()
     {
         dbContextOptions = new DbContextOptionsBuilder<AppDbContext>()
@@ -50,7 +50,7 @@ public class ContatosUnitTestController
         validadorContatoMock = new Mock<IValidadorContato>();
 
         // Configuração padrão do mock para retornar uma lista vazia (nenhum erro)
-        validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>()))
-            .ReturnsAsync(new List<string>());
+        validadorContatoMock.Setup(v => v.ValidarContatoAsync(It.IsAny<Contato>(), It.IsAny<int>()))
+                .ReturnsAsync(new Dictionary<string, string>());
     }
 }

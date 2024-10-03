@@ -4,5 +4,5 @@ namespace API_Agenda.Services;
 
 public interface IValidadorContato
 {
-    public Task<List<string>> ValidarContatoAsync(Contato contato);
+    public Task<Dictionary<string, string>> ValidarContatoAsync(Contato contato, int id);
 }

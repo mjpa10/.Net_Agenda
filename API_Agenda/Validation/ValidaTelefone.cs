@@ -1,4 +1,5 @@
 ﻿
+using API_Agenda.Models;
 using APIAgenda.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,8 @@ public class ValidaTelefone : IValidaTelefone
     {
         _context = context;
     }
-    public async Task<bool> ValidaTelefoneAsync(string telefone)
+    public async Task<bool> ValidaTelefoneAsync(string telefone, int contatoId)
     {
-        return await _context.Contatos.AnyAsync(a => a.Telefone == telefone);
+        return await _context.Contatos.AnyAsync(a => a.Telefone == telefone && a.Id != contatoId);
     }
 }
