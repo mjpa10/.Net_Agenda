@@ -1,0 +1,32 @@
+services:
+  api_agenda:
+    container_name: aspnet
+    build:
+      context: .
+      dockerfile: API_Agenda/Dockerfile
+    depends_on:
+       - database
+    ports:
+    - "5000:8080"
+    restart: always
+    environment:
+     - ASPNETCORE_URLS=http://+:8080
+     - DBHOST=database
+     - ASPNETCORE_ENVIRONMENT=Development
+
+  database:
+     image: mysql:8.0.22  
+     container_name: mysqldb
+     ports:
+        - "3306:3306"
+     volumes:
+        - db-volume:/var/lib/mysql
+     restart: always
+     environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: agendadb
+
+volumes:
+  db-volume:

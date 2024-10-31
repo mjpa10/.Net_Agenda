@@ -57,7 +57,7 @@ string? mySqlConnection = builder.Configuration.GetConnectionString("DefaultConn
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(mySqlConnection
-    ,ServerVersion.AutoDetect(mySqlConnection)));   
+    , new MySqlServerVersion(new Version(8, 0, 22))));   
 
 var app = builder.Build();
 
@@ -75,5 +75,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate(); // Executa as migrações pendentes
+}
 
 app.Run();

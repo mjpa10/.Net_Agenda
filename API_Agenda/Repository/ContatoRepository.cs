@@ -43,9 +43,6 @@ public class ContatoRepository : IContatoRepository
     {
         var contato = _context.Contatos.Find(id);
 
-        if (contato == null)
-            throw new ArgumentNullException(nameof(contato));
-
         _context.Contatos.Remove(contato);
         return contato;
     }
